@@ -19,23 +19,18 @@ class StoreProductRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'         => [
+            'name'          => [
                 'required',
             ],
-            'price'        => [
+            'image'         => [
                 'required',
             ],
-            'categories.*' => [
+            'cost'          => [
+                'required',
+            ],
+            'restaurant_id' => [
+                'required',
                 'integer',
-            ],
-            'categories'   => [
-                'array',
-            ],
-            'tags.*'       => [
-                'integer',
-            ],
-            'tags'         => [
-                'array',
             ],
         ];
     }

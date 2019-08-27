@@ -19,23 +19,15 @@ class UpdateProductRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'         => [
+            'name'          => [
                 'required',
             ],
-            'price'        => [
+            'cost'          => [
                 'required',
             ],
-            'categories.*' => [
+            'restaurant_id' => [
+                'required',
                 'integer',
-            ],
-            'categories'   => [
-                'array',
-            ],
-            'tags.*'       => [
-                'integer',
-            ],
-            'tags'         => [
-                'array',
             ],
         ];
     }

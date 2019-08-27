@@ -28,50 +28,46 @@
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.product.fields.description') }}
+                            {{ trans('cruds.product.fields.descr') }}
                         </th>
                         <td>
-                            {!! $product->description !!}
+                            {{ $product->descr }}
                         </td>
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.product.fields.price') }}
+                            {{ trans('cruds.product.fields.image') }}
                         </th>
                         <td>
-                            ${{ $product->price }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            Categories
-                        </th>
-                        <td>
-                            @foreach($product->categories as $id => $category)
-                                <span class="label label-info label-many">{{ $category->name }}</span>
-                            @endforeach
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            Tags
-                        </th>
-                        <td>
-                            @foreach($product->tags as $id => $tag)
-                                <span class="label label-info label-many">{{ $tag->name }}</span>
-                            @endforeach
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.product.fields.photo') }}
-                        </th>
-                        <td>
-                            @if($product->photo)
-                                <a href="{{ $product->photo->getUrl() }}" target="_blank">
-                                    <img src="{{ $product->photo->getUrl('thumb') }}" width="50px" height="50px">
+                            @if($product->image)
+                                <a href="{{ $product->image->getUrl() }}" target="_blank">
+                                    <img src="{{ $product->image->getUrl('thumb') }}" width="50px" height="50px">
                                 </a>
                             @endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            {{ trans('cruds.product.fields.cost') }}
+                        </th>
+                        <td>
+                            ${{ $product->cost }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            {{ trans('cruds.product.fields.category') }}
+                        </th>
+                        <td>
+                            {{ $product->category->name ?? '' }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            {{ trans('cruds.product.fields.restaurant') }}
+                        </th>
+                        <td>
+                            {{ $product->restaurant->r_name ?? '' }}
                         </td>
                     </tr>
                 </tbody>

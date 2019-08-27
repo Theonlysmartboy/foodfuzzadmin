@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Category;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\MediaUploadingTrait;
 use App\Http\Requests\MassDestroyProductRequest;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Product;
-use App\ProductCategory;
-use App\ProductTag;
+use App\Restaurant;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Yajra\DataTables\Facades\DataTables;
 
 class ProductController extends Controller
 {
@@ -31,21 +32,19 @@ class ProductController extends Controller
     {
         abort_if(Gate::denies('product_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $categories = ProductCategory::all()->pluck('name', 'id');
+        $categories = Category::all()->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $tags = ProductTag::all()->pluck('name', 'id');
+        $restaurants = Restaurant::all()->pluck('r_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.products.create', compact('categories', 'tags'));
+        return view('admin.products.create', compact('categories', 'restaurants'));
     }
 
     public function store(StoreProductRequest $request)
     {
         $product = Product::create($request->all());
-        $product->categories()->sync($request->input('categories', []));
-        $product->tags()->sync($request->input('tags', []));
 
-        if ($request->input('photo', false)) {
-            $product->addMedia(storage_path('tmp/uploads/' . $request->input('photo')))->toMediaCollection('photo');
+        if ($request->input('image', false)) {
+            $product->addMedia(storage_path('tmp/uploads/' . $request->input('image')))->toMediaCollection('image');
         }
 
         return redirect()->route('admin.products.index');
@@ -55,27 +54,25 @@ class ProductController extends Controller
     {
         abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $categories = ProductCategory::all()->pluck('name', 'id');
+        $categories = Category::all()->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $tags = ProductTag::all()->pluck('name', 'id');
+        $restaurants = Restaurant::all()->pluck('r_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $product->load('categories', 'tags');
+        $product->load('category', 'restaurant', 'created_by');
 
-        return view('admin.products.edit', compact('categories', 'tags', 'product'));
+        return view('admin.products.edit', compact('categories', 'restaurants', 'product'));
     }
 
     public function update(UpdateProductRequest $request, Product $product)
     {
         $product->update($request->all());
-        $product->categories()->sync($request->input('categories', []));
-        $product->tags()->sync($request->input('tags', []));
 
-        if ($request->input('photo', false)) {
-            if (!$product->photo || $request->input('photo') !== $product->photo->file_name) {
-                $product->addMedia(storage_path('tmp/uploads/' . $request->input('photo')))->toMediaCollection('photo');
+        if ($request->input('image', false)) {
+            if (!$product->image || $request->input('image') !== $product->image->file_name) {
+                $product->addMedia(storage_path('tmp/uploads/' . $request->input('image')))->toMediaCollection('image');
             }
-        } elseif ($product->photo) {
-            $product->photo->delete();
+        } elseif ($product->image) {
+            $product->image->delete();
         }
 
         return redirect()->route('admin.products.index');
@@ -85,7 +82,7 @@ class ProductController extends Controller
     {
         abort_if(Gate::denies('product_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $product->load('categories', 'tags');
+        $product->load('category', 'restaurant', 'created_by');
 
         return view('admin.products.show', compact('product'));
     }

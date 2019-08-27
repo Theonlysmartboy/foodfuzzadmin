@@ -20,17 +20,15 @@ class ProductApiController extends Controller
     {
         abort_if(Gate::denies('product_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return new ProductResource(Product::with(['categories', 'tags'])->get());
+        return new ProductResource(Product::with(['category', 'restaurant', 'created_by'])->get());
     }
 
     public function store(StoreProductRequest $request)
     {
         $product = Product::create($request->all());
-        $product->categories()->sync($request->input('categories', []));
-        $product->tags()->sync($request->input('tags', []));
 
-        if ($request->input('photo', false)) {
-            $product->addMedia(storage_path('tmp/uploads/' . $request->input('photo')))->toMediaCollection('photo');
+        if ($request->input('image', false)) {
+            $product->addMedia(storage_path('tmp/uploads/' . $request->input('image')))->toMediaCollection('image');
         }
 
         return (new ProductResource($product))
@@ -42,21 +40,19 @@ class ProductApiController extends Controller
     {
         abort_if(Gate::denies('product_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return new ProductResource($product->load(['categories', 'tags']));
+        return new ProductResource($product->load(['category', 'restaurant', 'created_by']));
     }
 
     public function update(UpdateProductRequest $request, Product $product)
     {
         $product->update($request->all());
-        $product->categories()->sync($request->input('categories', []));
-        $product->tags()->sync($request->input('tags', []));
 
-        if ($request->input('photo', false)) {
-            if (!$product->photo || $request->input('photo') !== $product->photo->file_name) {
-                $product->addMedia(storage_path('tmp/uploads/' . $request->input('photo')))->toMediaCollection('photo');
+        if ($request->input('image', false)) {
+            if (!$product->image || $request->input('image') !== $product->image->file_name) {
+                $product->addMedia(storage_path('tmp/uploads/' . $request->input('image')))->toMediaCollection('image');
             }
-        } elseif ($product->photo) {
-            $product->photo->delete();
+        } elseif ($product->image) {
+            $product->image->delete();
         }
 
         return (new ProductResource($product))

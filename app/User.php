@@ -40,6 +40,21 @@ class User extends Authenticatable
         'email_verified_at',
     ];
 
+    public function restaurants()
+    {
+        return $this->hasMany(Restaurant::class, 'owner_id', 'id');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'created_by_id', 'id');
+    }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'created_by_id', 'id');
+    }
+
     public function getEmailVerifiedAtAttribute($value)
     {
         return $value ? Carbon::createFromFormat('Y-m-d H:i:s', $value)->format(config('panel.date_format') . ' ' . config('panel.time_format')) : null;

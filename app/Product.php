@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Traits\MultiTenantModelTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia\HasMedia;
@@ -10,12 +11,12 @@ use Spatie\MediaLibrary\Models\Media;
 
 class Product extends Model implements HasMedia
 {
-    use SoftDeletes, HasMediaTrait;
+    use SoftDeletes, MultiTenantModelTrait, HasMediaTrait;
 
     public $table = 'products';
 
     protected $appends = [
-        'photo',
+        'image',
     ];
 
     protected $dates = [
@@ -26,11 +27,14 @@ class Product extends Model implements HasMedia
 
     protected $fillable = [
         'name',
-        'price',
+        'cost',
+        'descr',
         'created_at',
         'updated_at',
         'deleted_at',
-        'description',
+        'category_id',
+        'restaurant_id',
+        'created_by_id',
     ];
 
     public function registerMediaConversions(Media $media = null)
@@ -38,24 +42,34 @@ class Product extends Model implements HasMedia
         $this->addMediaConversion('thumb')->width(50)->height(50);
     }
 
-    public function categories()
+    public function orders()
     {
-        return $this->belongsToMany(ProductCategory::class);
+        return $this->hasMany(Order::class, 'product_id', 'id');
     }
 
-    public function tags()
+    public function getImageAttribute()
     {
-        return $this->belongsToMany(ProductTag::class);
-    }
-
-    public function getPhotoAttribute()
-    {
-        $file = $this->getMedia('photo')->last();
+        $file = $this->getMedia('image')->last();
 
         if ($file) {
             $file->url = $file->getUrl();
         }
 
         return $file;
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    public function restaurant()
+    {
+        return $this->belongsTo(Restaurant::class, 'restaurant_id');
+    }
+
+    public function created_by()
+    {
+        return $this->belongsTo(User::class, 'created_by_id');
     }
 }
